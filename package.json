@@ -7,9 +7,9 @@
   "scripts": {
     "start": "unset ELECTRON_RUN_AS_NODE && electron --no-sandbox .",
     "obfuscate": "node scripts/obfuscate.js",
-    "build:win": "npm run obfuscate && electron-builder --win",
-    "build:mac": "npm run obfuscate && electron-builder --mac",
-    "build:linux": "npm run obfuscate && electron-builder --linux"
+    "build:win": "npm run obfuscate && electron-builder --win --publish never",
+    "build:mac": "npm run obfuscate && electron-builder --mac --publish never",
+    "build:linux": "npm run obfuscate && electron-builder --linux --publish never"
   },
   "build": {
     "appId": "com.prodesk.app",
@@ -18,9 +18,6 @@
       "output": "dist"
     },
     "asar": true,
-    "asarUnpack": [
-      "assets/**/*"
-    ],
     "extraMetadata": {
       "main": "build/main.js"
     },
@@ -33,73 +30,49 @@
     ],
     "afterPack": "./scripts/afterPack.js",
     "fileAssociations": [
-      {
-        "ext": [
-          "xlsx",
-          "xls",
-          "xlsm",
-          "xlsb",
-          "xltx",
-          "xltm",
-          "xlt",
-          "csv",
-          "tsv",
-          "txt",
-          "xml",
-          "xla",
-          "xlam",
-          "ods",
-          "fods",
-          "sxc",
-          "dif",
-          "slk",
-          "prn"
-        ],
-        "name": "Zoho Sheet Document",
-        "description": "Spreadsheet files",
-        "role": "Editor",
-        "icon": "assets/icon"
-      },
-      {
-        "ext": [
-          "docx",
-          "doc",
-          "docm",
-          "dotx",
-          "dotm",
-          "dot",
-          "odt",
-          "fodt",
-          "sxw",
-          "rtf",
-          "wps",
-          "wpd"
-        ],
-        "name": "Zoho Writer Document",
-        "description": "Word processing files",
-        "role": "Editor",
-        "icon": "assets/icon"
-      },
-      {
-        "ext": [
-          "pptx",
-          "ppt",
-          "pptm",
-          "potx",
-          "potm",
-          "pot",
-          "ppsx",
-          "pps",
-          "ppsm",
-          "odp",
-          "fodp",
-          "sxi"
-        ],
-        "name": "Zoho Show Presentation",
-        "description": "Presentation files",
-        "role": "Editor",
-        "icon": "assets/icon"
-      }
+      { "ext": "xlsx", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xls", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xlsm", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xlsb", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xltx", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xltm", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xlt", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "csv", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "tsv", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "txt", "name": "Text File", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xml", "name": "XML File", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xla", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "xlam", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "ods", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "fods", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "sxc", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "dif", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "slk", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "prn", "name": "Spreadsheet", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "docx", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "doc", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "docm", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "dotx", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "dotm", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "dot", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "odt", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "fodt", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "sxw", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "rtf", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "wps", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "wpd", "name": "Document", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "pptx", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "ppt", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "pptm", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "potx", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "potm", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "pot", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "ppsx", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "pps", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "ppsm", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "odp", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "fodp", "name": "Presentation", "role": "Editor", "icon": "assets/icon" },
+      { "ext": "sxi", "name": "Presentation", "role": "Editor", "icon": "assets/icon" }
     ],
     "win": {
       "target": [

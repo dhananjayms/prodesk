@@ -1,7 +1,7 @@
 {
   "name": "prodesk",
   "productName": "ProDesk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Desktop app that wraps Zoho Sheet, Zoho Writer, and Zoho Show in a single native window",
   "main": "main.js",
   "scripts": {

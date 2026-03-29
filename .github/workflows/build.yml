@@ -46,6 +46,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y rpm
       - run: npm run build:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

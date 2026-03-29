@@ -1,0 +1,231 @@
+{
+  "name": "prodesk",
+  "productName": "ProDesk",
+  "version": "1.0.0",
+  "description": "Desktop app that wraps Zoho Sheet, Zoho Writer, and Zoho Show in a single native window",
+  "main": "main.js",
+  "scripts": {
+    "start": "unset ELECTRON_RUN_AS_NODE && electron --no-sandbox .",
+    "obfuscate": "node scripts/obfuscate.js",
+    "build:win": "npm run obfuscate && electron-builder --win",
+    "build:mac": "npm run obfuscate && electron-builder --mac",
+    "build:linux": "npm run obfuscate && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.prodesk.app",
+    "productName": "ProDesk",
+    "directories": {
+      "output": "dist"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "assets/**/*"
+    ],
+    "extraMetadata": {
+      "main": "build/main.js"
+    },
+    "files": [
+      "build/main.js",
+      "build/preload.js",
+      "build/renderer.js",
+      "index.html",
+      "assets/**/*"
+    ],
+    "afterPack": "./scripts/afterPack.js",
+    "fileAssociations": [
+      {
+        "ext": [
+          "xlsx",
+          "xls",
+          "xlsm",
+          "xlsb",
+          "xltx",
+          "xltm",
+          "xlt",
+          "csv",
+          "tsv",
+          "txt",
+          "xml",
+          "xla",
+          "xlam",
+          "ods",
+          "fods",
+          "sxc",
+          "dif",
+          "slk",
+          "prn"
+        ],
+        "name": "Zoho Sheet Document",
+        "description": "Spreadsheet files",
+        "role": "Editor",
+        "icon": "assets/icon"
+      },
+      {
+        "ext": [
+          "docx",
+          "doc",
+          "docm",
+          "dotx",
+          "dotm",
+          "dot",
+          "odt",
+          "fodt",
+          "sxw",
+          "rtf",
+          "wps",
+          "wpd"
+        ],
+        "name": "Zoho Writer Document",
+        "description": "Word processing files",
+        "role": "Editor",
+        "icon": "assets/icon"
+      },
+      {
+        "ext": [
+          "pptx",
+          "ppt",
+          "pptm",
+          "potx",
+          "potm",
+          "pot",
+          "ppsx",
+          "pps",
+          "ppsm",
+          "odp",
+          "fodp",
+          "sxi"
+        ],
+        "name": "Zoho Show Presentation",
+        "description": "Presentation files",
+        "role": "Editor",
+        "icon": "assets/icon"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false,
+      "differentialPackage": true
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.productivity",
+      "extendInfo": {
+        "CFBundleDocumentTypes": [
+          {
+            "CFBundleTypeName": "Spreadsheet",
+            "CFBundleTypeRole": "Editor",
+            "LSItemContentTypes": [
+              "org.openxmlformats.spreadsheetml.sheet",
+              "com.microsoft.excel.xls"
+            ]
+          },
+          {
+            "CFBundleTypeName": "Document",
+            "CFBundleTypeRole": "Editor",
+            "LSItemContentTypes": [
+              "org.openxmlformats.wordprocessingml.document",
+              "com.microsoft.word.doc"
+            ]
+          },
+          {
+            "CFBundleTypeName": "Presentation",
+            "CFBundleTypeRole": "Editor",
+            "LSItemContentTypes": [
+              "org.openxmlformats.presentationml.presentation",
+              "com.microsoft.powerpoint.ppt"
+            ]
+          }
+        ],
+        "LSHandlerRank": "Alternate"
+      }
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Office",
+      "mimeTypes": [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "application/vnd.ms-excel.sheet.macroEnabled.12",
+        "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+        "application/vnd.ms-excel.template.macroEnabled.12",
+        "application/vnd.ms-excel.addin.macroEnabled.12",
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.sun.xml.calc",
+        "application/xml",
+        "text/csv",
+        "text/tab-separated-values",
+        "text/plain",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+        "application/vnd.ms-word.document.macroEnabled.12",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+        "application/vnd.ms-word.template.macroEnabled.12",
+        "application/vnd.oasis.opendocument.text",
+        "application/vnd.sun.xml.writer",
+        "application/rtf",
+        "application/vnd.ms-works",
+        "application/vnd.wordperfect",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.ms-powerpoint.presentation.macroEnabled.12",
+        "application/vnd.openxmlformats-officedocument.presentationml.template",
+        "application/vnd.ms-powerpoint.template.macroEnabled.12",
+        "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+        "application/vnd.ms-powerpoint.slideshow.macroEnabled.12",
+        "application/vnd.oasis.opendocument.presentation",
+        "application/vnd.sun.xml.impress"
+      ]
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "your-github-username",
+      "repo": "prodesk"
+    }
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "@electron/fuses": "^1.8.0",
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0",
+    "javascript-obfuscator": "^4.2.2"
+  },
+  "author": "",
+  "license": "MIT"
+}

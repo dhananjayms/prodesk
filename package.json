@@ -213,7 +213,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "your-github-username",
+      "owner": "dhananjayms",
       "repo": "prodesk"
     }
   },

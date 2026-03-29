@@ -152,7 +152,7 @@
         "deb",
         "rpm"
       ],
-      "icon": "assets/prodesk.png",
+      "icon": "assets/icons/",
       "category": "Office",
       "mimeTypes": [
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

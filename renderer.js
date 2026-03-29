@@ -88,90 +88,26 @@ function hideOverlayAfterDelay(ms) {
   overlayTimer = setTimeout(hideOverlay, ms);
 }
 
-// ── Upload file to Zoho via webview ─────────────────────────────────
-// Injects the file into the Zoho import page's file input after it loads.
-function uploadFileToWebview(webview, zohoApp, fileName, base64, mimeType) {
-  // Navigate to the app home first (so user is on the right Zoho app)
-  const currentUrl = webview.getURL();
-  const isOnZoho = currentUrl && currentUrl.includes('zoho.com');
-
-  // Wait for the webview to be ready, then trigger Zoho's native upload
-  // by injecting a file into the page's drag-and-drop handler
-  const injectScript = `
-    (function() {
-      try {
-        var base64 = "${base64}";
-        var byteChars = atob(base64);
-        var byteArray = new Uint8Array(byteChars.length);
-        for (var i = 0; i < byteChars.length; i++) {
-          byteArray[i] = byteChars.charCodeAt(i);
-        }
-        var blob = new Blob([byteArray], { type: "${mimeType}" });
-        var file = new File([blob], "${fileName}", { type: "${mimeType}" });
-        var dt = new DataTransfer();
-        dt.items.add(file);
-
-        // Try to find the file input on the page and set the file
-        var inputs = document.querySelectorAll('input[type="file"]');
-        if (inputs.length > 0) {
-          inputs[0].files = dt.files;
-          inputs[0].dispatchEvent(new Event('change', { bubbles: true }));
-          'uploaded-via-input';
-        } else {
-          // Trigger drag-and-drop on the document body
-          var dropEvent = new DragEvent('drop', {
-            bubbles: true,
-            dataTransfer: dt
-          });
-          document.body.dispatchEvent(dropEvent);
-          'uploaded-via-drop';
-        }
-      } catch(e) {
-        'error: ' + e.message;
-      }
-    })();
-  `;
-
-  // If already on Zoho, inject directly after a short delay
-  if (isOnZoho) {
-    setTimeout(() => {
-      webview.executeJavaScript(injectScript).then((result) => {
-        console.log('File injection result:', result);
-      }).catch(console.error);
-    }, 1500);
-  } else {
-    // Navigate to home first, then inject after load
-    webview.loadURL(HOME_URLS[zohoApp]);
-    webview.addEventListener('did-finish-load', function onLoad() {
-      webview.removeEventListener('did-finish-load', onLoad);
-      setTimeout(() => {
-        webview.executeJavaScript(injectScript).then((result) => {
-          console.log('File injection result:', result);
-        }).catch(console.error);
-      }, 2000);
-    });
-  }
-}
-
 // ── Handle incoming file from main process ──────────────────────────
 window.electronAPI.onOpenFile((payload) => {
   try {
-    const { app: zohoApp, fileName, base64, mimeType } = payload;
+    const { app: zohoApp, fileName } = payload;
 
     // 1. Switch to the correct tab
     switchTab(zohoApp);
 
-    // 2. Show the upload overlay
+    // 2. Show brief overlay
     showOverlay(fileName, zohoApp);
+    hideOverlayAfterDelay(2000);
 
-    // 3. Get the webview and upload the file
+    // 3. Navigate to the Zoho app's home if not already there
     const webview = document.getElementById(zohoApp);
     if (webview) {
-      uploadFileToWebview(webview, zohoApp, fileName, base64, mimeType);
+      const currentUrl = webview.getURL() || '';
+      if (!currentUrl.includes('zoho.com')) {
+        webview.loadURL(HOME_URLS[zohoApp]);
+      }
     }
-
-    // 4. Hide overlay after upload attempt
-    hideOverlayAfterDelay(4000);
   } catch (err) {
     hideOverlay();
     alert(`Failed to open file: ${err.message}`);
@@ -217,26 +153,20 @@ document.addEventListener('drop', (e) => {
     return;
   }
 
-  // Read the file and trigger the upload flow
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const base64 = reader.result.split(',')[1];
-      const mimeType = file.type || 'application/octet-stream';
+  try {
+    switchTab(zohoApp);
+    showOverlay(file.name, zohoApp);
+    hideOverlayAfterDelay(2000);
 
-      switchTab(zohoApp);
-      showOverlay(file.name, zohoApp);
-
-      const webview = document.getElementById(zohoApp);
-      if (webview) {
-        uploadFileToWebview(webview, zohoApp, file.name, base64, mimeType);
+    const webview = document.getElementById(zohoApp);
+    if (webview) {
+      const currentUrl = webview.getURL() || '';
+      if (!currentUrl.includes('zoho.com')) {
+        webview.loadURL(HOME_URLS[zohoApp]);
       }
-
-      hideOverlayAfterDelay(4000);
-    } catch (err) {
-      hideOverlay();
-      alert(`Failed to open dropped file: ${err.message}`);
     }
-  };
-  reader.readAsDataURL(file);
+  } catch (err) {
+    hideOverlay();
+    alert(`Failed to open dropped file: ${err.message}`);
+  }
 });

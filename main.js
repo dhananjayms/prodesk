@@ -1,3 +1,14 @@
+// ── Global error handler — suppress known Electron/Zoho popup timing errors ──
+process.on('uncaughtException', (error) => {
+  if (error.message.includes('Render frame was disposed') ||
+      error.message.includes('WebFrameMain') ||
+      error.message.includes('frame was removed')) {
+    console.log('Suppressed known error:', error.message);
+    return;
+  }
+  console.error('Uncaught Exception:', error);
+});
+
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -33,10 +44,23 @@ const store = new Store({
 });
 
 // ── Security: validate Zoho URLs ──────────────────────────────────────────────
+const ZOHO_DOMAINS = ['.zoho.com', '.zoho.in', '.zoho.eu', '.zoho.com.au', '.zoho.jp', '.zohocloud.ca'];
+
 function isZohoUrl(url) {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === 'https:' && parsed.hostname.endsWith('.zoho.com');
+    return parsed.protocol === 'https:' &&
+      ZOHO_DOMAINS.some(d => parsed.hostname.endsWith(d));
+  } catch {
+    return false;
+  }
+}
+
+function isZohoAuthUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' &&
+      (parsed.hostname.startsWith('accounts.zoho') || parsed.hostname.startsWith('accounts.zohocloud'));
   } catch {
     return false;
   }
@@ -187,9 +211,10 @@ app.whenReady().then(() => {
   const filePath = getSupportedFileFromArgs(process.argv);
   if (filePath) pendingFilePath = filePath;
 
+  // Show first-launch prompt after a delay so it doesn't block the UI
   if (store.get('firstLaunch')) {
     store.set('firstLaunch', false);
-    showFirstLaunchPrompt();
+    setTimeout(() => showFirstLaunchPrompt(), 3000);
   }
 });
 
@@ -218,7 +243,8 @@ function createWindow() {
       webviewTag: true,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
+      partition: 'persist:zoho',
       allowRunningInsecureContent: false,
       enableWebSQL: false,
     },
@@ -252,12 +278,36 @@ function createWindow() {
       }
     });
 
-    // Redirect new-window requests for Zoho URLs back into the webview
+    // Allow Zoho auth popups as real windows; deny everything else
     webviewContents.setWindowOpenHandler(({ url }) => {
+      if (isZohoAuthUrl(url)) {
+        return {
+          action: 'allow',
+          overrideBrowserWindowOptions: {
+            width: 550,
+            height: 700,
+            webPreferences: {
+              nodeIntegration: false,
+              contextIsolation: true,
+              partition: 'persist:zoho',
+            },
+          },
+        };
+      }
+      // Non-auth Zoho URLs: load in the webview instead of a popup
       if (isZohoUrl(url)) {
         webviewContents.loadURL(url);
       }
       return { action: 'deny' };
+    });
+
+    // Prevent crash on frame disposal
+    webviewContents.on('render-process-gone', (_event, details) => {
+      console.log('Render process gone:', details.reason);
+    });
+
+    webviewContents.on('destroyed', () => {
+      console.log('WebContents destroyed');
     });
   });
 

@@ -193,6 +193,28 @@
   <!-- Drag-and-drop highlight -->
   <div id="drop-zone">Drop file here to open</div>
 
+  <script>
+    // Handle Zoho login popups and webview crashes
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('webview').forEach(wv => {
+        // Popup handling is done by the main process setWindowOpenHandler.
+        // This listener is a fallback to prevent unhandled new-window events.
+        wv.addEventListener('new-window', (e) => {
+          e.preventDefault();
+        });
+
+        // Auto-reload on webview crash
+        wv.addEventListener('crashed', () => {
+          console.log('webview crashed, reloading...');
+          wv.reload();
+        });
+
+        wv.addEventListener('destroyed', () => {
+          console.log('webview destroyed');
+        });
+      });
+    });
+  </script>
   <script src="build/renderer.js"></script>
 </body>
 </html>

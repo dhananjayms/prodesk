@@ -25,8 +25,13 @@
       "build/main.js",
       "build/preload.js",
       "build/renderer.js",
-      "index.html",
-      "!assets"
+      "index.html"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/prodesk.png",
+        "to": "prodesk.png"
+      }
     ],
     "afterPack": "./scripts/afterPack.js",
     "fileAssociations": [
